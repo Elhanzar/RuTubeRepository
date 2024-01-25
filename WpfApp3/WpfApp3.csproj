@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Calculator_30001 %282%29.png" />
+    <None Remove="icons8-палец-вверх-48 %281%29.png" />
+    <None Remove="icons8-палец-вверх-48.png" />
+    <None Remove="pngwing.com %282%29.png" />
+    <None Remove="YOUTUBE_icon-icons.com_65487.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql" Version="6.0.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+    <PackageReference Include="System.Runtime.WindowsRuntime.UI.Xaml" Version="4.7.0" />
+    <Resource Include="ImgFls\Calculator_30001 %282%29.png" />
+    <Resource Include="ImgFls\icons8-палец-вверх-48 %281%29.png" />
+    <Resource Include="ImgFls\icons8-палец-вверх-48.png" />
+    <Resource Include="ImgFls\pngwing.com %282%29.png" />
+    <Resource Include="ImgFls\YOUTUBE_icon-icons.com_65487.png" />
+	  <Compile Update="Resource1.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Resource1.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>  
+</Project>

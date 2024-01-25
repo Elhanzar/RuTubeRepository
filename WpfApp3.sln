@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34024.191
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfApp3", "WpfApp3\WpfApp3.csproj", "{C75C56A2-7597-4CAB-81FE-21AA99329749}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resurseses", "Resurseses", "{658C85A2-9939-47F4-B51F-4B78DD04F3DA}"
+	ProjectSection(SolutionItems) = preProject
+		WpfApp3\MediaP1.wmv = WpfApp3\MediaP1.wmv
+		WpfApp3\VideoProborka1.wmv = WpfApp3\VideoProborka1.wmv
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C75C56A2-7597-4CAB-81FE-21AA99329749}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C75C56A2-7597-4CAB-81FE-21AA99329749}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C75C56A2-7597-4CAB-81FE-21AA99329749}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C75C56A2-7597-4CAB-81FE-21AA99329749}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1317D6DD-1F36-4F7B-9E62-2064A67B9B7E}
+	EndGlobalSection
+EndGlobal
