@@ -31,9 +31,6 @@ namespace WpfApp3
 
         List<MediaFiles> resultMedia = new List<MediaFiles>();
         List<Comment> resultComment = new List<Comment>();
-        List<LDS> likes = new List<LDS>();
-        List<LDS> dislikes = new List<LDS>();
-        List<LDS> subscribes = new List<LDS>();
         User user = new User();
         ~MainWindow(){
             resultMedia.Clear();
