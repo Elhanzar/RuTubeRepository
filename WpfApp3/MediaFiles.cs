@@ -20,7 +20,7 @@ namespace WpfApp3
         public int id { get; set; }
         public string URI { get; set; }
         public string name { get; set; }
-        public DateTime date  { get; set; }
+        public DateTime date { get; set; }
         public int like { get; set; }
         public int deslike { get; set; }
         public string ComentName { get; set; }
@@ -37,6 +37,11 @@ namespace WpfApp3
             SourseMedia = MedFiles;
         }
 
+        public MetodsMediaFiles()
+        {
+            CheckConnection();
+        }
+
         private bool CheckConnection()
         {
             try
@@ -46,7 +51,6 @@ namespace WpfApp3
             catch
             {
                 MessageBox.Show("Error");
-                con.Close();
                 return false;
             }
             return true;
@@ -58,157 +62,131 @@ namespace WpfApp3
         //https://drive.google.com/uc?export=download&confirm=no_antivirus&id=1gKuuhDjPebccv_yVmkZxqCLw9LGyNHeb cyberpubk
         public bool CreateBd()
         {
-            if (CheckConnection())
+            using var cmd = new NpgsqlCommand();
+            try
             {
-                using var cmd = new NpgsqlCommand();
-                try
-                {
-                    cmd.Connection = con;
-                    cmd.CommandText = ($"DROP TABLE IF EXISTS mediafile");
-                    cmd.ExecuteNonQueryAsync();
-                    cmd.CommandText = "CREATE TABLE mediafile(id SERIAL PRIMARY KEY, " +
-                        "uri text NOT NULL UNIQUE CHECK(uri!=''), " +
-                        "name text NOT NULL UNIQUE CHECK(name!=''), " +
-                        "date timestamp NOT NULL, " +
-                        "likeonly integer DEFAULT 0," +
-                        "deslikeonly integer DEFAULT 0," +
-                        "userid integer NOT NULL CHECK(userid!=null))";
-                    cmd.ExecuteNonQueryAsync();
-                }
-                catch
-                {
-                    MessageBox.Show("Exit", "Попробуйте снова");
-                }
-                cmd.Dispose();
-                con.Close();
+                cmd.Connection = con;
+                cmd.CommandText = ($"DROP TABLE IF EXISTS mediafile");
+                cmd.ExecuteNonQueryAsync();
+                cmd.CommandText = "CREATE TABLE mediafile(id SERIAL PRIMARY KEY, " +
+                    "uri text NOT NULL UNIQUE CHECK(uri!=''), " +
+                    "name text NOT NULL UNIQUE CHECK(name!=''), " +
+                    "date timestamp NOT NULL, " +
+                    "likeonly integer DEFAULT 0," +
+                    "deslikeonly integer DEFAULT 0," +
+                    "userid integer NOT NULL CHECK(userid!=null))";
+                cmd.ExecuteNonQueryAsync();
             }
-            else { return false; }
+            catch
+            {
+                MessageBox.Show("Exit", "Попробуйте снова");
+            }
+            cmd.Dispose();
             return true;
         }
 
         public bool ADDBd(MediaFiles mediaFiles)
         {
-            if (CheckConnection())
+
+            using var cmd = new NpgsqlCommand();
+            try
             {
-                using var cmd = new NpgsqlCommand();
-                try
-                {
-                    cmd.Connection = con;
-                    cmd.CommandText = $"INSERT INTO mediafile (uri,name,date,userid)" +
-                        $" VALUES ('{mediaFiles.URI}','{mediaFiles.name}','{mediaFiles.date}'," +
-                        $"{mediaFiles.userid})";
-                    cmd.ExecuteNonQueryAsync();
-                }
-                catch
-                {
-                    MessageBox.Show("Exit", "Попробуйте снова");
-                    return false;
-                }
-                cmd.Dispose();
-                con.Close();
+                cmd.Connection = con;
+                cmd.CommandText = $"INSERT INTO mediafile (uri,name,date,userid)" +
+                    $" VALUES ('{mediaFiles.URI}','{mediaFiles.name}','{mediaFiles.date}'," +
+                    $"{mediaFiles.userid})";
+                cmd.ExecuteNonQueryAsync();
             }
-            else { MessageBox.Show("Exit", "Попробуйте снова");  return false; }
+            catch
+            {
+                MessageBox.Show("Exit", "Попробуйте снова");
+                return false;
+            }
+            cmd.Dispose();
             return true;
         }
 
         public bool PRINTBd()
         {
-            if (CheckConnection())
+            using var cmd = new NpgsqlCommand();
+            cmd.Connection = con;
+            cmd.CommandText = $"SELECT * FROM mediafile ORDER BY likeonly ,date DESC";
+            NpgsqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
-                using var cmd = new NpgsqlCommand();
-                cmd.Connection = con;
-                cmd.CommandText = $"SELECT * FROM mediafile ";
-                NpgsqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    MedFiles.Add(
-                        new MediaFiles()
-                        {
-                            id = (int)reader["id"],
-                            URI = (string)reader["uri"],
-                            name = (string)reader["name"],
-                            date = (DateTime)reader["date"],
-                            like = (int)reader["likeonly"],
-                            deslike = (int)reader["deslikeonly"],
-                            userid = (int)reader["userid"]
-                        }
-                    );
-                }
-                if (MedFiles.Count == 0)
-                {
-                    return false;
-                }
-
-                cmd.Dispose();
-                con.Dispose();
-                con.Close();
+                MedFiles.Add(
+                    new MediaFiles()
+                    {
+                        id = (int)reader["id"],
+                        URI = (string)reader["uri"],
+                        name = (string)reader["name"],
+                        date = (DateTime)reader["date"],
+                        like = (int)reader["likeonly"],
+                        deslike = (int)reader["deslikeonly"],
+                        userid = (int)reader["userid"]
+                    }
+                );
             }
-            else { return false; }
+            if (MedFiles.Count == 0)
+            {
+                return false;
+            }
+
+            cmd.Dispose();
             return true;
         }
         public bool PRINTBdWithPoiskovik(string text)
         {
-            if (CheckConnection())
+            using var cmd = new NpgsqlCommand();
+            cmd.Connection = con;
+            cmd.CommandText = $"SELECT * FROM mediafile WHERE name LIKE '{text}%'";
+            NpgsqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
-                using var cmd = new NpgsqlCommand();
-                cmd.Connection = con;
-                cmd.CommandText = $"SELECT * FROM mediafile WHERE name LIKE '{text}%'";
-                NpgsqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    MedFiles.Add(
-                        new MediaFiles()
-                        {
-                            id = (int)reader["id"],
-                            URI = (string)reader["uri"],
-                            name = (string)reader["name"],
-                            date = (DateTime)reader["date"],
-                            like = (int)reader["likeonly"],
-                            deslike = (int)reader["deslikeonly"],
-                            userid = (int)reader["userid"]
-                        }
-                    );
-                }
-                if (MedFiles.Count == 0)
-                {
-                    return false;
-                }
-
-                cmd.Dispose();
-                con.Dispose();
-                con.Close();
+                MedFiles.Add(
+                    new MediaFiles()
+                    {
+                        id = (int)reader["id"],
+                        URI = (string)reader["uri"],
+                        name = (string)reader["name"],
+                        date = (DateTime)reader["date"],
+                        like = (int)reader["likeonly"],
+                        deslike = (int)reader["deslikeonly"],
+                        userid = (int)reader["userid"]
+                    }
+                );
             }
-            else { return false; }
+            if (MedFiles.Count == 0)
+            {
+                return false;
+            }
+            cmd.Dispose();
             return true;
         }
         public bool UPDATEBd(MediaFiles mediaFiles)
         {
-            if (CheckConnection())
+            using var cmd = new NpgsqlCommand();
+            try
             {
-                using var cmd = new NpgsqlCommand();
-                try
-                {
-                    cmd.Connection = con;
-                    cmd.CommandText = $"UPDATE mediafile" +
-                    $" SET likeonly='{mediaFiles.like}'," +
-                    $" deslikeonly='{mediaFiles.deslike}'" +
-                    $" WHERE id = {mediaFiles.id}";
-                    cmd.ExecuteNonQueryAsync();
-                }
-                catch
-                {
-                    MessageBox.Show("Exit", "Попробуйте снова");
-                    return false;
-                }
-                cmd.Dispose();
-
+                cmd.Connection = con;
+                cmd.CommandText = $"UPDATE mediafile" +
+                $" SET likeonly='{mediaFiles.like}'," +
+                $" deslikeonly='{mediaFiles.deslike}'" +
+                $" WHERE id = {mediaFiles.id}";
+                cmd.ExecuteNonQuery();
             }
-            else { MessageBox.Show("Exit", "Попробуйте снова"); return false; }
+            catch
+            {
+                MessageBox.Show("Exit", "Попробуйте снова");
+                return false;
+            }
+            cmd.Dispose();
             return true;
         }
         ~MetodsMediaFiles()
         {
             con.Close();
+            con.Dispose();
         }
     }
 }

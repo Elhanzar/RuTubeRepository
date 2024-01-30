@@ -29,6 +29,11 @@ namespace WpfApp3
             SourseComment = comments;
         }
 
+        public MetodsComment()
+        {
+            CheckConnection();
+        }
+
         private bool CheckConnection()
         {
             try
@@ -38,7 +43,6 @@ namespace WpfApp3
             catch
             {
                 MessageBox.Show("Error");
-                con.Close();
                 return false;
             }
             return true;
@@ -49,83 +53,69 @@ namespace WpfApp3
         //https://drive.google.com/uc?export=download&confirm=no_antivirus&id=1gKuuhDjPebccv_yVmkZxqCLw9LGyNHeb cyberpubk
         public bool CreateBd()
         {
-            if (CheckConnection())
+            using var cmd = new NpgsqlCommand();
+            try
             {
-                using var cmd = new NpgsqlCommand();
-                try
-                {
-                    cmd.Connection = con;
-                    cmd.CommandText = $"CREATE TABLE comments (id SERIAL PRIMARY KEY," +
-                        "userid integer NOT NULL," +
-                        "mediaid integer NOT NULL," +
-                        "date timestamp NOT NULL," +
-                        "comment text NOT NULL," +
-                        "likecomm integer DEFAULT 0," +
-                        "deslikecomm integer DEFAULT 0 )";
-                    cmd.ExecuteNonQueryAsync();
-                }
-                catch
-                {
-                    MessageBox.Show("Exit", "Попробуйте снова");
-                }
-                cmd.Dispose();
-                con.Dispose();
+                cmd.Connection = con;
+                cmd.CommandText = $"CREATE TABLE comments (id SERIAL PRIMARY KEY," +
+                    "userid integer NOT NULL," +
+                    "mediaid integer NOT NULL," +
+                    "date timestamp NOT NULL," +
+                    "comment text NOT NULL," +
+                    "likecomm integer DEFAULT 0," +
+                    "deslikecomm integer DEFAULT 0 )";
+                cmd.ExecuteNonQueryAsync();
             }
-            else { return false; }
+            catch
+            {
+                MessageBox.Show("Exit", "Попробуйте снова");
+            }
+            cmd.Dispose();
             return true;
         }
         public bool ADDBd(Comment comment)
         {
-            if (CheckConnection())
+            using var cmd = new NpgsqlCommand();
+            try
             {
-                using var cmd = new NpgsqlCommand();
-                try
-                {
-                    cmd.Connection = con;
-                    cmd.CommandText = $"INSERT INTO comments (userid,mediaid,date,comment)" +
-                        $" VALUES ({comment.userid},{comment.mediaid},'{comment.date}'," +
-                        $"'{comment.comment}')";
-                    cmd.ExecuteNonQueryAsync();
-                }
-                catch
-                {
-                    MessageBox.Show("Exit", "Попробуйте снова");
-                }
-                cmd.Dispose();
+                cmd.Connection = con;
+                cmd.CommandText = $"INSERT INTO comments (userid,mediaid,date,comment)" +
+                    $" VALUES ({comment.userid},{comment.mediaid},'{comment.date}'," +
+                    $"'{comment.comment}')";
+                cmd.ExecuteNonQueryAsync();
             }
-            else { return false; }
+            catch
+            {
+                MessageBox.Show("Exit", "Попробуйте снова");
+            }
+            cmd.Dispose();
             return true;
         }
 
         public bool PRINTBd(int m_id)
         {
-            if (CheckConnection())
+            using var cmd = new NpgsqlCommand();
+            cmd.Connection = con;
+
+            cmd.CommandText = $"SELECT * FROM comments WHERE mediaid = {m_id} ORDER BY date DESC";
+            NpgsqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
-                using var cmd = new NpgsqlCommand();
-                cmd.Connection = con;
-
-                cmd.CommandText = $"SELECT * FROM comments WHERE mediaid = {m_id} ";
-                NpgsqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    comments.Add(
-                        new Comment()
-                        {
-                            id = (int)reader["id"],
-                            userid = (int)reader["userid"],
-                            mediaid = (int)reader["mediaid"],
-                            comment = (string)reader["comment"],
-                            date = (DateTime)reader["date"],
-                            like = (int)reader["likecomm"],
-                            deslike = (int)reader["deslikecomm"]
-                        }
-                    );
-                }
-
-                cmd.Dispose();
-                con.Dispose();
+                comments.Add(
+                    new Comment()
+                    {
+                        id = (int)reader["id"],
+                        userid = (int)reader["userid"],
+                        mediaid = (int)reader["mediaid"],
+                        comment = (string)reader["comment"],
+                        date = (DateTime)reader["date"],
+                        like = (int)reader["likecomm"],
+                        deslike = (int)reader["deslikecomm"]
+                    }
+                );
             }
-            else { return false; }
+
+            cmd.Dispose();
             return true;
         }
 
@@ -150,6 +140,7 @@ namespace WpfApp3
         ~MetodsComment()
         {
             con.Close();
+            con.Dispose();
         }
     }
 }

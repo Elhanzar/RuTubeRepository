@@ -20,8 +20,8 @@
         </Grid.RowDefinitions>
         <Label x:Name="labelprob"></Label>
         <ScrollViewer x:Name="GGScrol" Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Hidden"
-                      MaxHeight="700" 
-                      MaxWidth="1100"
+                      MaxHeight="600" 
+                      MaxWidth="900"
                       Height="{Binding ElementName=Window, 
                       Path=ActualHeight, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                       Width="{Binding ElementName=Window, 
@@ -155,26 +155,31 @@
                 RenderTransformOrigin="0.476,0.703" Height="28" Width="30" VerticalAlignment="Top" Margin="0,5,5,0" MouseDown="Button_Click_9" Source="/ImgFls/pngwing.com (2).png"/>
             </DockPanel>
         </Border>
-        <Expander x:Name="Menu" Height="116" Header="" Grid.Row="1" AutomationProperties.Name="Menu" 
-                   Foreground="#B2FFFFFF" VerticalAlignment="Top"
-                   HorizontalContentAlignment="Left" ExpandDirection="Right" IsExpanded="False" Expanded="Expander_Expanded">
+        <Expander x:Name="Menu" Height="150" Header="" Grid.Row="1" AutomationProperties.Name="Menu" VerticalAlignment="Top"
+                   HorizontalContentAlignment="Left" ExpandDirection="Right" IsExpanded="False" Expanded="Expander_Expanded" Foreground="#B2FFFFFF">
             <StackPanel Margin="5,0,10,0" Width="Auto" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Ellipse Width="40" Height="40" Grid.Column="0">
-                        <Ellipse.Fill>
-                            <ImageBrush x:Name="GGUserImage" ImageSource="/ImgFls/Calculator_30001 (2).png" Stretch="UniformToFill"/>
-                        </Ellipse.Fill>
-                    </Ellipse>
-                    <TextBlock x:Name="GGUserTextBlock" Grid.Column="1" Text="Никола" Margin="5,0,0,0" VerticalAlignment="Center"/>
-                </Grid>
-                <Button  Content="Добавить видео" Click="Button_Click" Height="Auto" Width="Auto" Background="{x:Null}" BorderThickness="0,0,0,1"/>
-                <Button  Content="Войти" Click="Button_Click_1" Height="Auto" Width="Auto" Background="{x:Null}" BorderThickness="0,0,0,1"/>
-                <Button  Content="Авторизоваться" Click="Button_Click_2" Height="Auto" Width="Auto" Background="{x:Null}" BorderThickness="0,0,0,1"/>
-                <Button  Content="Обновить" Click="Button_Click_3" Height="Auto" Width="Auto" Background="{x:Null}" BorderThickness="0,0,0,1"/>
+                <Border x:Name="GGMenuBorder" BorderThickness="0,0,0,1" BorderBrush="#FF6F6F6F" Margin="0,0,0,10">
+                    <StackPanel Margin="5,0,10,10" Width="Auto" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                        <Grid Margin="0,0,0,3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Ellipse Width="40" Height="40" Grid.Column="0">
+                                <Ellipse.Fill>
+                                    <ImageBrush x:Name="GGUserImage" ImageSource="/ImgFls/Calculator_30001 (2).png" Stretch="UniformToFill"/>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                            <TextBlock x:Name="GGUserTextBlock" Grid.Column="1" Text="Никола" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                        </Grid>
+                        <Button  Content="Добавить видео" Click="Button_Click" Height="Auto" Width="Auto" Background="{x:Null}" BorderThickness="0,0,0,0"/>
+                        <Button  Content="Обновить" Click="Button_Click_3" Height="Auto" Width="Auto" Background="{x:Null}" BorderThickness="0,0,0,0"/>
+                    </StackPanel>
+                </Border>
+                <StackPanel Margin="5,0,10,0" Width="Auto" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                    <Button  Content="Войти" Click="Button_Click_1" Height="Auto" Width="Auto" Background="{x:Null}" BorderThickness="0,0,0,0"/>
+                    <Button  Content="Зарегистрироваться" Click="Button_Click_2" Height="Auto" Width="Auto" Background="{x:Null}" BorderThickness="0,0,0,0"/>
+                </StackPanel>
             </StackPanel>
         </Expander>
     </Grid>

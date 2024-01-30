@@ -25,6 +25,11 @@ namespace WpfApp3
             SourseLDS = lds;
         }
 
+        public MetodsLDS()
+        {
+            CheckConnection();
+        }
+
         private NpgsqlConnection con = new NpgsqlConnection(
         connectionString: ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString);
 
@@ -41,125 +46,101 @@ namespace WpfApp3
             }
             return true;
         }
-        public bool ADDBd(LDS dS,string text)
+        public bool ADDBd(LDS dS, string text)
         {
-            if (CheckConnection())
+            using var cmd = new NpgsqlCommand();
+            try
             {
-                using var cmd = new NpgsqlCommand();
-                try
-                {
-                    cmd.Connection = con;
-                    cmd.CommandText = $"INSERT INTO {text} (userid,mediaid,date)" +
-                        $" VALUES ({dS.userid},{dS.mediaid},'{dS.date}')";
-                    cmd.ExecuteNonQueryAsync();
-                }
-                catch
-                {
-                    MessageBox.Show("Exit", "Попробуйте снова");
-                    return false;
-                }
-                cmd.Dispose();
+                cmd.Connection = con;
+                cmd.CommandText = $"INSERT INTO {text} (userid,mediaid,date)" +
+                    $" VALUES ({dS.userid},{dS.mediaid},'{dS.date}')";
+                cmd.ExecuteNonQueryAsync();
             }
-            else { MessageBox.Show("Exit", "Попробуйте снова"); return false; }
+            catch
+            {
+                MessageBox.Show("Exit", "Попробуйте снова");
+                return false;
+            }
+            cmd.Dispose();
             return true;
         }
-        public bool PRINTBd(LDS ds,string text)
+        public bool PRINTBd(LDS ds, string text)
         {
-            if (CheckConnection())
+            LDS lDS = new LDS();
+            using var cmd = new NpgsqlCommand();
+            NpgsqlDataReader reader;
+
+            cmd.Connection = con;
+            cmd.CommandText = $"SELECT * FROM {text} WHERE userid = {ds.userid} AND mediaid = {ds.mediaid}";
+            reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
-                LDS lDS = new LDS();
-                using var cmd = new NpgsqlCommand();
-                NpgsqlDataReader reader;
-                try
-                {
-                    cmd.Connection = con;
-                    cmd.CommandText = $"SELECT * FROM {text} WHERE userid = {ds.userid} AND mediaid = {ds.mediaid}";
-                    reader = cmd.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        lDS.id = (int)reader["id"];
-                        lDS.userid = (int)reader["userid"];
-                        lDS.mediaid = (int)reader["mediaid"];
-                        lDS.date = (DateTime)reader["date"];
-                    }
-                    if (lDS.mediaid==0)
-                    {
-                        return true;
-                    }
-                    else 
-                    {
-                        return false; 
-                    }
-                }
-                catch
-                {
-                    MessageBox.Show("Exit", "Попробуйте снова");
-                    return false;
-                }
+                lDS.id = (int)reader["id"];
+                lDS.userid = (int)reader["userid"];
+                lDS.mediaid = (int)reader["mediaid"];
+                lDS.date = (DateTime)reader["date"];
             }
-            else { return false; }
+            cmd.Dispose();
+            if (lDS.mediaid == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         public bool PRINTBd(string text)
         {
-            if (CheckConnection())
+            using var cmd = new NpgsqlCommand();
+            try
             {
-                using var cmd = new NpgsqlCommand();
-                try
+                cmd.Connection = con;
+                cmd.CommandText = $"SELECT * FROM {text} ";
+                NpgsqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
                 {
-                    cmd.Connection = con;
-                    cmd.CommandText = $"SELECT * FROM {text} ";
-                    NpgsqlDataReader reader = cmd.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        lds.Add(
-                            new LDS()
-                            {
-                                id = (int)reader["id"],
-                                userid = (int)reader["userid"],
-                                mediaid = (int)reader["mediaid"],
-                                date = (DateTime)reader["date"]
-                            }
-                        );
-                    }
+                    lds.Add(
+                        new LDS()
+                        {
+                            id = (int)reader["id"],
+                            userid = (int)reader["userid"],
+                            mediaid = (int)reader["mediaid"],
+                            date = (DateTime)reader["date"]
+                        }
+                    );
                 }
-                catch
-                {
-                    MessageBox.Show("Exit", "Попробуйте снова");
-                    return false;
-                }
-
-                cmd.Dispose();
-                con.Dispose();
-                con.Close();
             }
-            else { return false; }
+            catch
+            {
+                MessageBox.Show("Exit", "Попробуйте снова");
+                return false;
+            }
+
+            cmd.Dispose();
             return true;
         }
-        public bool DROPBd(LDS lDS,string text)
+        public bool DROPBd(LDS lDS, string text)
         {
-            if (CheckConnection())
+            using var cmd = new NpgsqlCommand();
+            try
             {
-                using var cmd = new NpgsqlCommand();
-                try
-                {
-                    cmd.Connection = con;
-                    cmd.CommandText = $"DELETE FROM {text} WHERE userid = {lDS.userid} AND mediaid = {lDS.mediaid}";
-                    cmd.ExecuteNonQueryAsync();
-                }
-                catch
-                {
-                    MessageBox.Show("Exit", "Попробуйте снова");
-                    return false;
-                }
+                cmd.Connection = con;
+                cmd.CommandText = $"DELETE FROM {text} WHERE userid = {lDS.userid} AND mediaid = {lDS.mediaid}";
+                cmd.ExecuteNonQueryAsync();
             }
-            else { return false; }
+            catch
+            {
+                MessageBox.Show("Exit", "Попробуйте снова");
+                return false;
+            }
+            cmd.Dispose();
             return true;
-
         }
         ~MetodsLDS()
         {
-            con.Dispose();
             con.Close();
+            con.Dispose();
         }
     }
 }

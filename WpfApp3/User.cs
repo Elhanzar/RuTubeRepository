@@ -1,11 +1,10 @@
-﻿using Npgsql;
+﻿using Microsoft.VisualBasic;
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -36,14 +35,17 @@ namespace WpfApp3
         {
             SourseUser = UserUser;
         }
-
+        public MetodsUser()
+        {
+            CheckConnection();
+        }
         private bool CheckConnection()
         {
             try
             {
                 con.Open();
             }
-            catch (NpgsqlException)
+            catch
             {
                 MessageBox.Show("Error");
                 return false;
@@ -53,58 +55,51 @@ namespace WpfApp3
 
         public bool CreateBd()
         {
-            if (CheckConnection())
+            using var cmd = new NpgsqlCommand();
+            try
             {
-                using var cmd = new NpgsqlCommand();
-                try
-                {
-                    cmd.Connection = con;
-                    cmd.CommandText = ($"DROP TABLE IF EXISTS polzovatel");
-                    cmd.ExecuteNonQueryAsync();
-                    cmd.CommandText = "CREATE TABLE polzovatel (id SERIAL PRIMARY KEY," +
-                        "first_name text NOT NULL," +
-                        "last_name text NOT NULL," +
-                        "email text NOT NULL UNIQUE CHECK(email!='')," +
-                        "password text NOT NULL)";
-                    cmd.ExecuteNonQueryAsync();
-                }
-                catch
-                {
-                    MessageBox.Show("Exit", "Попробуйте снова");
-                }
-                cmd.Dispose();
-                con.Close();
+                cmd.Connection = con;
+                cmd.CommandText = ($"DROP TABLE IF EXISTS polzovatel");
+                cmd.ExecuteNonQueryAsync();
+                cmd.CommandText = "CREATE TABLE polzovatel (id SERIAL PRIMARY KEY," +
+                    "first_name text NOT NULL," +
+                    "last_name text NOT NULL," +
+                    "email text NOT NULL UNIQUE CHECK(email!='')," +
+                    "password text NOT NULL)";
+                cmd.ExecuteNonQueryAsync();
             }
-            else { return false; }
+            catch
+            {
+                MessageBox.Show("Exit", "Попробуйте снова");
+                return false;
+            }
+            cmd.Dispose();
             return true;
         }
 
         public bool ADDBd(User user)
         {
-            if (CheckConnection())
+            using var cmd = new NpgsqlCommand();
+            try
             {
-                using var cmd = new NpgsqlCommand();
-                try
-                {
-                    cmd.Connection = con;
-                    cmd.CommandText = $"INSERT INTO polzovatel (first_name,last_name,email,password,\"FotoUser\") VALUES ('{user.first_name}', '{user.last_name}', '{user.email}', '{user.password}', '{user.PhotoUser}')";
-                    cmd.ExecuteNonQueryAsync();
-                }
-                catch
-                {
-                    MessageBox.Show("Exit", "Попробуйте снова");
-                }
-                cmd.Dispose();
+                cmd.Connection = con;
+                cmd.CommandText = $"INSERT INTO polzovatel (first_name,last_name,email,password,\"FotoUser\") VALUES ('{user.first_name}', '{user.last_name}', '{user.email}', '{user.password}', '{user.PhotoUser}')";
+                cmd.ExecuteNonQueryAsync();
             }
-            else { return false; }
+            catch
+            {
+                MessageBox.Show("Exit", "Попробуйте снова");
+                return false;
+            }
+            cmd.Dispose();
             return true;
         }
 
         public bool PRINTBd(User user)
         {
-            if (CheckConnection())
+            using var cmd = new NpgsqlCommand();
+            try
             {
-                using var cmd = new NpgsqlCommand();
                 cmd.Connection = con;
                 cmd.CommandText = $"SELECT * FROM polzovatel WHERE password = '{user.password}'" +
                     $" AND first_name = '{user.first_name}'" +
@@ -121,24 +116,24 @@ namespace WpfApp3
                     UserUser.PhotoUser = (string)reader["FotoUser"];
                     UserUser.subscriber = (int)reader["subscriber"];
                 }
-                if (UserUser != null)
+                if (UserUser.id == 0)
                 {
-                    BinaryFormatter formatter = new BinaryFormatter();
-                    FileStream fs = new FileStream("people.dat", FileMode.OpenOrCreate);
-                    formatter.Serialize(fs, UserUser);
-                    fs.Close();
+                    MessageBox.Show("We don't have this user");
+                    return false;
                 }
-                cmd.Dispose();
-                con.Close();
             }
-            else { return false; }
+            catch
+            {
+                return false;
+            }
+            cmd.Dispose();
             return true;
         }
-        public bool PRINTBd(int u)
+        public bool PRINTBd(int u, ref User SourseUser)
         {
-            if (CheckConnection())
+            using var cmd = new NpgsqlCommand();
+            try
             {
-                using var cmd = new NpgsqlCommand();
                 cmd.Connection = con;
                 cmd.CommandText = $"SELECT * FROM polzovatel WHERE id = {u}";
                 NpgsqlDataReader reader = cmd.ExecuteReader();
@@ -148,41 +143,38 @@ namespace WpfApp3
                     UserUser.first_name = (string)reader[1];
                     UserUser.last_name = (string)reader[2];
                     UserUser.PhotoUser = (string)reader["FotoUser"];
-                    UserUser.subscriber = (int)reader["subscriber"]; 
+                    UserUser.subscriber = (int)reader["subscriber"];
                 }
-                cmd.Dispose();
-                con.Close();
+                SourseUser = UserUser;
+
             }
-            else { return false; }
+            catch
+            {
+                return false;
+            }
             return true;
         }
         public bool UPDATEBd(User user)
         {
-            if (CheckConnection())
+            using var cmd = new NpgsqlCommand();
+            try
             {
-                using var cmd = new NpgsqlCommand();
-                try
-                {
-                    cmd.Connection = con;
-                    cmd.CommandText = $"UPDATE polzovatel" +
-                    $" SET subscriber = {user.subscriber}" +
-                    $" WHERE id = {user.id}";
-                    cmd.ExecuteNonQueryAsync();
-                }
-                catch
-                {
-                    MessageBox.Show("Exit", "Попробуйте снова");
-                    return false;
-                }
-                cmd.Dispose();
-
+                cmd.Connection = con;
+                cmd.CommandText = $"UPDATE polzovatel SET subscriber = {user.subscriber} WHERE id = {user.id}";
+                cmd.ExecuteNonQuery();
             }
-            else { MessageBox.Show("Exit", "Попробуйте снова"); return false; }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return false;
+            }
+            cmd.Dispose();
             return true;
         }
         ~MetodsUser()
         {
             con.Close();
+            con.Dispose();
         }
     }
 

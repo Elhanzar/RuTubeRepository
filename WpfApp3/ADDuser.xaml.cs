@@ -33,7 +33,7 @@ namespace WpfApp3
             user.password = Password.Password.ToString();
             user.PhotoUser = "https://drive.google.com/uc?export=download&confirm=no_antivirus&id=1tGIs5hxYfUXzSN_zEc-4Vk2W3LytexUJ";
             MetodsUser metoduser = new MetodsUser();
-            if (metoduser.ADDBd(this.user))
+            if (metoduser.ADDBd(user))
             {
                 Close();
             }

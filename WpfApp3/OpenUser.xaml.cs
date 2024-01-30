@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,8 +13,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Xml.Linq;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-
 
 namespace WpfApp3
 {
@@ -42,6 +41,11 @@ namespace WpfApp3
             MetodsUser metoduser = new MetodsUser();
             if (metoduser.PRINTBd(userFromOpen))
             {
+                metoduser.SourseUser(ref userFromOpen);
+                BinaryFormatter formatter = new BinaryFormatter();
+                var fs = new FileStream("people.dat", FileMode.OpenOrCreate);
+                formatter.Serialize(fs, userFromOpen);
+                fs.Close();
                 Close(); 
             }
             else { MessageBox.Show("Error","Не удалось подключится к серверу"); }

@@ -24,15 +24,16 @@ using static System.Net.WebRequestMethods;
 
 
 namespace WpfApp3
-{    
+{
     public partial class MainWindow : Window
     {
         DispatcherTimer timer = new DispatcherTimer();
 
         List<MediaFiles> resultMedia = new List<MediaFiles>();
         List<Comment> resultComment = new List<Comment>();
-        User user = new User();
-        ~MainWindow(){
+        public User user = new User();
+        ~MainWindow()
+        {
             resultMedia.Clear();
             resultComment.Clear();
         }
@@ -49,18 +50,34 @@ namespace WpfApp3
         void Userusing()
         {
             BinaryFormatter formatter = new BinaryFormatter();
-            FileStream fs = new FileStream("people.dat", FileMode.OpenOrCreate);
+            var fs = new FileStream("people.dat", FileMode.OpenOrCreate);
             if (fs.Length != 0)
             {
                 user = (User)formatter.Deserialize(fs);
+                fs.Close();
+                if (new MetodsUser().PRINTBd(user))
+                {
+                    GGMenuBorder.IsEnabled = true;
+                    GGScrol.IsEnabled = true;
+                }
+                else
+                {
+                    GGMenuBorder.IsEnabled = false;
+                    GGScrol.IsEnabled = false;
+                }
             }
-            fs.Close();
+            else
+            {
+                GGMenuBorder.IsEnabled = false;
+                GGScrol.IsEnabled = false;
+            }
         }
         public MainWindow()
         {
             InitializeComponent();
             Userusing();
             GenerationMediaPanels();
+            new MetodsUser().UPDATEBd(user);
         }
         bool Poiskmediabool = false;
         private void GenerationMediaPanels()
@@ -76,12 +93,13 @@ namespace WpfApp3
             }
             else { metodsMediaFiles.PRINTBd(); }
             metodsMediaFiles.SourseMedia(ref resultMedia);
-            
-            for(int i=0;i<resultMedia.Count;i++)
+
+            for (int i = 0; i < resultMedia.Count; i++)
             {
-                var mediaPlayer = new MediaElement(){ 
+                var mediaPlayer = new MediaElement()
+                {
                     Width = 300,
-                    Height=200
+                    Height = 200
                 };
                 TextBlock textBlock = new TextBlock();
                 textBlock.TextWrapping = TextWrapping.Wrap;
@@ -90,7 +108,7 @@ namespace WpfApp3
                 textBlock.Text = resultMedia[i].name;
                 textBlock.Width = 150;
                 textBlock.Height = 200;
-                textBlock.Margin = new Thickness(10,5,0,0);
+                textBlock.Margin = new Thickness(10, 5, 0, 0);
 
                 mediaPlayer.Source = new Uri($"{resultMedia[i].URI}", UriKind.Absolute);
                 mediaPlayer.Tag = resultMedia[i];
@@ -111,10 +129,10 @@ namespace WpfApp3
                 dockPanel.Margin = new Thickness(20);
 
                 Border border = new Border();
-                border.CornerRadius = new CornerRadius(8,8,8,8);
+                border.CornerRadius = new CornerRadius(8, 8, 8, 8);
                 border.BorderBrush = Brushes.Gray;
                 border.BorderThickness = new Thickness(3, 3, 3, 3);
-                border.Margin = new Thickness(0,20,0,0);
+                border.Margin = new Thickness(0, 20, 0, 0);
                 border.Child = (dockPanel);
                 stackPanel.Children.Add(border);
             }
@@ -141,18 +159,17 @@ namespace WpfApp3
                 textBlock1.HorizontalAlignment = HorizontalAlignment.Left;
                 textBlock1.Text = resultComment[i].comment;
 
-                Metuser.PRINTBd(resultComment[i].userid);
-                Metuser.SourseUser(ref uuComm);
+                new MetodsUser().PRINTBd(resultComment[i].userid, ref uuComm);
                 TextBlock textBlock2 = new TextBlock();
-                textBlock2.Margin = new Thickness(10,0, 0, 0);
+                textBlock2.Margin = new Thickness(10, 0, 0, 0);
                 textBlock2.Width = 50;
                 textBlock2.TextWrapping = TextWrapping.Wrap;
                 textBlock2.HorizontalAlignment = HorizontalAlignment.Left;
                 textBlock2.Text = uuComm.first_name;
-                
+
                 Image myImage = new Image();
                 myImage.Width = 50;
-                myImage.HorizontalAlignment= HorizontalAlignment.Left;
+                myImage.HorizontalAlignment = HorizontalAlignment.Left;
                 myImage.VerticalAlignment = VerticalAlignment.Top;
                 if (uuComm.PhotoUser != null)
                 {
@@ -233,10 +250,8 @@ namespace WpfApp3
             Volum.Value = 10;
             GeneratorCommentPanels();
             MediaFiles mediaFiles = (MediaFiles)element.Tag;
-            MetodsUser metodsUser = new MetodsUser();
             User bloger = new User();
-            metodsUser.PRINTBd(mediaFiles.userid);
-            metodsUser.SourseUser(ref bloger);
+            new MetodsUser().PRINTBd(mediaFiles.userid, ref bloger);
 
             if (bloger.PhotoUser != null)
             {
@@ -260,13 +275,12 @@ namespace WpfApp3
             if (!new MetodsSub().PRINTBd(dSub, "sub"))
             {
                 SubButton.Background = Brushes.Gray;
-                GGSubBlock_withSUSI.Text = bloger.subscriber.ToString();
             }
             else
             {
                 SubButton.Background = Brushes.Red;
-                GGSubBlock_withSUSI.Text = bloger.subscriber.ToString();
             }
+            GGSubBlock_withSUSI.Text = bloger.subscriber.ToString();
 
             LDS dS = new LDS();
             dS.userid = user.id;
@@ -365,10 +379,12 @@ namespace WpfApp3
             comment.comment = textboxComment.Text;
             comment.date = DateTime.UtcNow;
             //MessageBox.Show($"{comment.userid}\n{comment.mediaid}\n{comment.comment}\n{comment.date.ToString("dd.MM.yyyy")}");
-            metodsComment.ADDBd(comment);
-            textboxComment.Text="";
-            CommentPanel.Children.Clear();
-            GeneratorCommentPanels();
+            if (textboxComment.Text != "" & textboxComment.Text != " ") {
+                metodsComment.ADDBd(comment);
+                textboxComment.Text = "";
+                CommentPanel.Children.Clear();
+                GeneratorCommentPanels();
+            }
         }
 
         private void Expander_Expanded(object sender, RoutedEventArgs e)
@@ -398,7 +414,7 @@ namespace WpfApp3
             dS.userid = user.id;
             dS.mediaid = mediaFiles.id;
             dS.date = DateTime.UtcNow;
-            if (new MetodsLDS().PRINTBd(dS,"favorits"))
+            if (new MetodsLDS().PRINTBd(dS, "favorits"))
             {
                 mediaFiles.like += 1;
                 mMF.UPDATEBd(mediaFiles);
@@ -492,31 +508,31 @@ namespace WpfApp3
         private void Button_Click_sub(object sender, RoutedEventArgs e)
         {
             MediaFiles mediaFiles = (MediaFiles)element.Tag;
-            MetodsUser metodsUser = new MetodsUser();
             User bloger = new User();
-            metodsUser.PRINTBd(mediaFiles.userid);
-            metodsUser.SourseUser(ref bloger);
-
+            new MetodsUser().PRINTBd(mediaFiles.userid, ref bloger);
+            MessageBox.Show($"{bloger.id}\n{bloger.subscriber}");
             Sub dS = new Sub();
             dS.userid = user.id;
             dS.blogerid = mediaFiles.userid;
             dS.date = DateTime.UtcNow;
             if (new MetodsSub().PRINTBd(dS, "sub"))
             {
-                bloger.subscriber += 1;
-                metodsUser.UPDATEBd(bloger);
+                bloger.subscriber++;
+                MessageBox.Show($"{bloger.id}\n{bloger.subscriber}");
+                new MetodsUser().UPDATEBd(bloger);
                 new MetodsSub().ADDBd(dS, "sub");
                 SubButton.Background = Brushes.Gray;
-                GGSubBlock_withSUSI.Text = bloger.subscriber.ToString();
             }
             else
             {
-                bloger.subscriber -= 1;
-                metodsUser.UPDATEBd(bloger);
+
+                bloger.subscriber--;
+                MessageBox.Show($"{bloger.id}\n{bloger.subscriber}");
+                new MetodsUser().UPDATEBd(bloger);
                 new MetodsSub().DROPBd(dS, "sub");
                 SubButton.Background = Brushes.Red;
-                GGSubBlock_withSUSI.Text = bloger.subscriber.ToString();
             }
+            GGSubBlock_withSUSI.Text = bloger.subscriber.ToString();
         }
     }
 }
