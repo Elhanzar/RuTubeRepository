@@ -173,7 +173,11 @@ namespace WpfApp3
         }
         ~MetodsUser()
         {
-            con.Close();
+            try
+            {
+                con.Close();
+            }
+            catch { }
             con.Dispose();
         }
     }

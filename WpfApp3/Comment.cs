@@ -80,7 +80,7 @@ namespace WpfApp3
             {
                 cmd.Connection = con;
                 cmd.CommandText = $"INSERT INTO comments (userid,mediaid,date,comment)" +
-                    $" VALUES ({comment.userid},{comment.mediaid},'{comment.date}'," +
+                    $" VALUES ({comment.userid},{comment.mediaid},'{comment.date.ToString("u")}'," +
                     $"'{comment.comment}')";
                 cmd.ExecuteNonQueryAsync();
             }
@@ -139,7 +139,11 @@ namespace WpfApp3
         //}
         ~MetodsComment()
         {
-            con.Close();
+            try
+            {
+                con.Close();
+            }
+            catch { }
             con.Dispose();
         }
     }

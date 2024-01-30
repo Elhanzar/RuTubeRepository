@@ -42,7 +42,6 @@ namespace WpfApp3
             MediaFiles.like = 0;
             MediaFiles.deslike = 0;
             MediaFiles.userid = User.id;
-            MediaFiles.ComentName = MediaName.Text.ToString();
             if (MetodsMediaFiles.ADDBd(MediaFiles))
             {
                 Close();

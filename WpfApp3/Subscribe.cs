@@ -53,7 +53,7 @@ namespace WpfApp3
             {
                 cmd.Connection = con;
                 cmd.CommandText = $"INSERT INTO {text} (userid,blogerid,date)" +
-                    $" VALUES ({dS.userid},{dS.blogerid},'{dS.date}')";
+                    $" VALUES ({dS.userid},{dS.blogerid},'{dS.date.ToString("u")}')";
                 cmd.ExecuteNonQueryAsync();
             }
             catch
@@ -139,7 +139,11 @@ namespace WpfApp3
         }
         ~MetodsSub()
         {
-            con.Close();
+            try
+            {
+                con.Close();
+            }
+            catch { }
             con.Dispose();
         }
     }

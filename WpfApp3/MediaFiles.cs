@@ -23,7 +23,6 @@ namespace WpfApp3
         public DateTime date { get; set; }
         public int like { get; set; }
         public int deslike { get; set; }
-        public string ComentName { get; set; }
         public int userid { get; set; }
     }
     internal class MetodsMediaFiles
